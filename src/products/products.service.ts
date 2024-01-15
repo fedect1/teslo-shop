@@ -105,9 +105,7 @@ export class ProductsService {
         await queryRunner.manager.delete( ProductImage, { product: { id } } )
         product.images = images.map( image => this.productImageRepository.create({ url: image }) )
 
-      } else {
-
-      }
+      };
 
       await queryRunner.manager.save( product );
 
@@ -131,6 +129,19 @@ export class ProductsService {
     if ( error.code === '23505' ) throw new BadRequestException(error.detail);
     this.logger.error(error)
     throw new InternalServerErrorException('Unexpected error')
+  }
+
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions( error )
+    }
   }
 
 }
